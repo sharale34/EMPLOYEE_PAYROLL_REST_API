@@ -35,6 +35,13 @@ public class EmployeePayrollService {
 			employeePayrollData.salary = salary;
 	}
 
+	public void deleteEmployeePayroll(String name, IOService ioService) {
+		EmployeePayrollData employeePayrollData = this.getEmployeePayrollData(name);
+		System.out.println(this.getEmployeePayrollData(name));
+		if (employeePayrollData != null)
+			employeePayrollList.remove(employeePayrollData);
+	}
+
 	public EmployeePayrollData getEmployeePayrollData(String name) {
 		return this.employeePayrollList.stream()
 				.filter(employeePayrollData -> employeePayrollData.name.equalsIgnoreCase(name)).findFirst()
