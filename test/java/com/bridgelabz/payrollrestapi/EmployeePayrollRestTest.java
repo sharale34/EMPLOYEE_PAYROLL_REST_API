@@ -73,17 +73,37 @@ public class EmployeePayrollRestTest {
 	public void givenListOfNewEmployees_WhenAdded__ShouldMatchEmployeeCount() {
 		EmployeePayrollData[] arrayOfEmps = getEmployeeList(); // population the employeePayroll List
 		employeePayrollService = new EmployeePayrollService(Arrays.asList(arrayOfEmps));
-		EmployeePayrollData[] arrayOfEmployeePayrolls = { new EmployeePayrollData(0, "Sundar Pichai", "M", 4000000.00, LocalDate.now()),
+		EmployeePayrollData[] arrayOfEmployeePayrolls = {
+				new EmployeePayrollData(0, "Sundar Pichai", "M", 4000000.00, LocalDate.now()),
 				new EmployeePayrollData(0, "Mukesh", "M", 3000000.00, LocalDate.now()),
 				new EmployeePayrollData(0, "Anil", "M", 2000000.00, LocalDate.now()) };
+		// Recursively calling each added employee and checking the statusCode
 		for (EmployeePayrollData employeePayrollData : arrayOfEmployeePayrolls) {
 			Response response = addEmployeeToJSONServer(employeePayrollData);
 			int statusCode = response.getStatusCode();
 			Assert.assertEquals(201, statusCode);
+			// converting the added ones into objects from the json file
 			employeePayrollData = new Gson().fromJson(response.asString(), EmployeePayrollData.class);
+			// adding objects into the employee payroll
 			employeePayrollService.addEmployeeToPayroll(employeePayrollData, IOService.REST_IO);
 		}
 		long entries = employeePayrollService.countEntries(IOService.REST_IO);
 		Assert.assertEquals(6, entries);
+	}
+
+	@Test
+	public void givenNewSalaryForEmployee_WhenUpdated_ShouldMatch() {
+		EmployeePayrollData[] arrayOfEmps = getEmployeeList(); // population the employeePayroll List
+		employeePayrollService = new EmployeePayrollService(Arrays.asList(arrayOfEmps));
+		employeePayrollService.updateEmployeeSalary("Bill Gates", 3000000.00, IOService.REST_IO);
+		EmployeePayrollData employeePayrollData = employeePayrollService.getEmployeePayrollData("Bill Gates");
+		// adding newly inserted employee to the Json server
+		String empJson = new Gson().toJson(employeePayrollData);
+		RequestSpecification request = RestAssured.given(); // Allows to specify how the request will look like
+		request.header("Content-Type", "application/json");
+		request.body(empJson);
+		Response response = request.put("/employees/" + employeePayrollData.id);
+		int statusCode = response.getStatusCode();
+		Assert.assertEquals(200, statusCode);
 	}
 }
