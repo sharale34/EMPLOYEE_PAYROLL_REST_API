@@ -1,10 +1,30 @@
 package com.bridgelabz.payrollrestapi;
 
-import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EmployeePayrollService {
-	public static void main(String[] args) {
-		Logger log = Logger.getLogger(EmployeePayrollService.class.getName());
-		log.info("Welcome to the Employee Payroll Rest API Program.");
+	private List<EmployeePayrollData> employeePayrollList;
+
+	public enum IOService {
+		CONSOLE_IO, FILE_IO, DB_IO, REST_IO;
+	}
+
+	public EmployeePayrollService() {
+	}
+
+	public EmployeePayrollService(List<EmployeePayrollData> employeeList) {
+		this();
+		this.employeePayrollList = new ArrayList<>(employeeList); // Use new memory not the same as provided by client
+	}
+
+	public long countEntries(IOService ioService) {
+		if (ioService.equals(IOService.REST_IO))
+			return employeePayrollList.size();
+		return 0;
+	}
+
+	public void addEmployeeToPayroll(EmployeePayrollData employeePayrollData, IOService ioService) {
+		employeePayrollList.add(employeePayrollData);
 	}
 }
